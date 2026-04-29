@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ModernReader — Signal Dashboard</title>
+  <style>
+    /* ── Reset & base ────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0a0d14;
+      --surface:   #12161f;
+      --border:    #1e2636;
+      --text:      #c8d0e0;
+      --muted:     #4a5568;
+      --accent:    #3b82f6;
+
+      /* state colours */
+      --calm-c:    #00c8d4;
+      --curious-c: #00aaff;
+      --active-c:  #00e064;
+      --alert-c:   #ff5020;
+      --chaotic-c: #cc00ff;
+      --unknown-c: #445566;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", system-ui, sans-serif;
+      font-size: 14px;
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+    }
+
+    /* ── Header ─────────────────────────────────────────────────── */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    header h1 { font-size: 1.1rem; letter-spacing: 0.05em; color: #e2e8f0; }
+    header h1 span { color: var(--accent); }
+    #conn-badge {
+      font-size: 0.75rem;
+      padding: 3px 10px;
+      border-radius: 99px;
+      background: #1e2636;
+      border: 1px solid var(--border);
+    }
+    #conn-badge.live { border-color: #22c55e; color: #22c55e; }
+    #conn-badge.dead { border-color: #ef4444; color: #ef4444; }
+
+    /* ── Layout ─────────────────────────────────────────────────── */
+    main {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      grid-template-rows: auto 1fr;
+      gap: 16px;
+      padding: 20px;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* ── Panels ─────────────────────────────────────────────────── */
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+    }
+    .panel h2 {
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    /* ── State card (left column, spans full height) ─────────────── */
+    #state-panel {
+      grid-row: 1 / 3;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Orb visualiser */
+    #orb-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 20px 0;
+    }
+    #orb {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #ffffff22, var(--unknown-c));
+      box-shadow: 0 0 40px 8px var(--unknown-c);
+      transition: background 0.6s ease, box-shadow 0.6s ease, transform 0.3s ease;
+    }
+    #state-label {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--unknown-c);
+      transition: color 0.5s;
+    }
+    #confidence-bar-wrap {
+      width: 100%;
+    }
+    #confidence-bar-wrap label {
+      font-size: 0.7rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    #confidence-track {
+      background: var(--border);
+      border-radius: 4px;
+      height: 6px;
+      overflow: hidden;
+    }
+    #confidence-fill {
+      height: 100%;
+      background: var(--unknown-c);
+      border-radius: 4px;
+      width: 0%;
+      transition: width 0.5s, background 0.5s;
+    }
+
+    /* Tangible readouts */
+    .readout-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .readout {
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+    }
+    .readout .r-label { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.07em; text-transform: uppercase; }
+    .readout .r-value { font-size: 1.3rem; font-weight: 700; margin-top: 4px; color: #e2e8f0; }
+
+    /* LED swatch */
+    #led-swatch {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #141414;
+      box-shadow: 0 0 12px 2px #141414;
+      margin: 0 auto 4px;
+      transition: background 0.5s, box-shadow 0.5s;
+    }
+
+    /* ── Feature charts (right column, top) ─────────────────────── */
+    #features-panel { }
+    #features-panel canvas { display: block; width: 100%; height: 180px; }
+
+    /* ── Signal log (right column, bottom) ──────────────────────── */
+    #log-panel { }
+    #signal-log {
+      height: 200px;
+      overflow-y: auto;
+      font-family: "Cascadia Code", "Fira Mono", monospace;
+      font-size: 0.72rem;
+      color: var(--muted);
+      padding-right: 4px;
+    }
+    #signal-log .log-line { padding: 3px 0; border-bottom: 1px solid #1a2030; }
+    #signal-log .log-line .ts { color: #334155; margin-right: 8px; }
+    #signal-log .log-line .node { color: var(--accent); margin-right: 6px; }
+    #signal-log .log-line.calm    .st { color: var(--calm-c); }
+    #signal-log .log-line.curious .st { color: var(--curious-c); }
+    #signal-log .log-line.active  .st { color: var(--active-c); }
+    #signal-log .log-line.alert   .st { color: var(--alert-c); }
+    #signal-log .log-line.chaotic .st { color: var(--chaotic-c); }
+
+    /* ── Simulate buttons ────────────────────────────────────────── */
+    #sim-panel { grid-column: 1 / 3; }
+    #sim-panel .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .sim-btn {
+      flex: 1 1 100px;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #0d1117;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.8rem;
+      letter-spacing: 0.04em;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .sim-btn:hover { background: #1a2233; }
+    .sim-btn[data-state="calm"]    { border-color: var(--calm-c);    }
+    .sim-btn[data-state="curious"] { border-color: var(--curious-c); }
+    .sim-btn[data-state="active"]  { border-color: var(--active-c);  }
+    .sim-btn[data-state="alert"]   { border-color: var(--alert-c);   }
+    .sim-btn[data-state="chaotic"] { border-color: var(--chaotic-c); }
+
+    /* ── Footer ─────────────────────────────────────────────────── */
+    footer {
+      text-align: center;
+      padding: 8px;
+      font-size: 0.65rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #0a0d14; }
+    ::-webkit-scrollbar-thumb { background: #1e2636; border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Modern<span>Reader</span> &mdash; Signal Dashboard</h1>
+  <span id="conn-badge" class="dead">disconnected</span>
+</header>
+
+<main>
+
+  <!-- ── Left column: state ── -->
+  <section class="panel" id="state-panel">
+    <h2>Current State</h2>
+
+    <div id="orb-wrap">
+      <div id="orb"></div>
+      <div id="state-label">UNKNOWN</div>
+      <div id="confidence-bar-wrap">
+        <label>
+          <span>Confidence</span>
+          <span id="conf-pct">0%</span>
+        </label>
+        <div id="confidence-track"><div id="confidence-fill"></div></div>
+      </div>
+    </div>
+
+    <div class="readout-grid">
+      <div class="readout">
+        <div class="r-label">LED</div>
+        <div id="led-swatch"></div>
+        <div id="led-value" class="r-value" style="font-size:0.75rem">–</div>
+      </div>
+      <div class="readout">
+        <div class="r-label">Vibration</div>
+        <div id="vib-value" class="r-value">–</div>
+      </div>
+      <div class="readout">
+        <div class="r-label">Servo °</div>
+        <div id="servo-value" class="r-value">–</div>
+      </div>
+      <div class="readout">
+        <div class="r-label">Nodes</div>
+        <div id="nodes-value" class="r-value" style="font-size:0.8rem">–</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Right top: feature chart ── -->
+  <section class="panel" id="features-panel">
+    <h2>Audio Features (last 60 samples)</h2>
+    <canvas id="feat-canvas"></canvas>
+  </section>
+
+  <!-- ── Right bottom: log ── -->
+  <section class="panel" id="log-panel">
+    <h2>Signal Log</h2>
+    <div id="signal-log"></div>
+  </section>
+
+  <!-- ── Bottom: simulate ── -->
+  <section class="panel" id="sim-panel">
+    <h2>Inject Simulated Signal (for development)</h2>
+    <div class="btn-row">
+      <button class="sim-btn" data-state="calm">Inject CALM</button>
+      <button class="sim-btn" data-state="curious">Inject CURIOUS</button>
+      <button class="sim-btn" data-state="active">Inject ACTIVE</button>
+      <button class="sim-btn" data-state="alert">Inject ALERT</button>
+      <button class="sim-btn" data-state="chaotic">Inject CHAOTIC</button>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  ModernReader MVP &mdash; Signal → Meaning → Tangible Response
+</footer>
+
+<script>
+/* ───────────────────────────────────────────────────────────────
+   Configuration
+─────────────────────────────────────────────────────────────────*/
+const BACKEND = (location.hostname === "localhost" || location.hostname === "127.0.0.1")
+  ? "http://localhost:8765"
+  : `http://${location.hostname}:8765`;
+
+const WS_URL = BACKEND.replace(/^http/, "ws") + "/ws";
+
+/* ───────────────────────────────────────────────────────────────
+   State colours
+─────────────────────────────────────────────────────────────────*/
+const STATE_COLOR = {
+  calm    : "#00c8d4",
+  curious : "#00aaff",
+  active  : "#00e064",
+  alert   : "#ff5020",
+  chaotic : "#cc00ff",
+  unknown : "#445566",
+};
+
+/* ───────────────────────────────────────────────────────────────
+   Feature ring buffer for chart
+─────────────────────────────────────────────────────────────────*/
+const MAX_SAMPLES = 60;
+const series = { rms: [], zcr: [], centroid_norm: [] };
+
+function pushSample(features) {
+  const rms = features.rms ?? 0;
+  const zcr = features.zcr ?? 0;
+  const centroid_norm = Math.min((features.centroid ?? 0) / 5000, 1);
+  series.rms.push(rms);
+  series.zcr.push(zcr);
+  series.centroid_norm.push(centroid_norm);
+  if (series.rms.length > MAX_SAMPLES) {
+    series.rms.shift();
+    series.zcr.shift();
+    series.centroid_norm.shift();
+  }
+}
+
+/* ───────────────────────────────────────────────────────────────
+   Canvas chart
+─────────────────────────────────────────────────────────────────*/
+const canvas = document.getElementById("feat-canvas");
+const ctx    = canvas.getContext("2d");
+
+function resizeCanvas() {
+  canvas.width  = canvas.parentElement.clientWidth - 36;
+  canvas.height = 180;
+}
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
+
+function drawChart() {
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  // grid lines
+  ctx.strokeStyle = "#1e2636";
+  ctx.lineWidth = 1;
+  [0.25, 0.5, 0.75, 1.0].forEach(y => {
+    ctx.beginPath();
+    ctx.moveTo(0, H * (1 - y));
+    ctx.lineTo(W, H * (1 - y));
+    ctx.stroke();
+  });
+
+  function drawLine(data, color) {
+    if (!data.length) return;
+    const step = W / (MAX_SAMPLES - 1);
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.5;
+    data.forEach((v, i) => {
+      const x = i * step;
+      const y = H * (1 - Math.min(v, 1));
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+  }
+
+  drawLine(series.rms,            "#00e064");
+  drawLine(series.zcr,            "#00aaff");
+  drawLine(series.centroid_norm,  "#ff5020");
+
+  // legend
+  const legend = [
+    { label: "RMS",      color: "#00e064" },
+    { label: "ZCR",      color: "#00aaff" },
+    { label: "Centroid", color: "#ff5020" },
+  ];
+  ctx.font = "11px sans-serif";
+  legend.forEach((l, i) => {
+    ctx.fillStyle = l.color;
+    ctx.fillRect(8 + i * 90, H - 18, 10, 10);
+    ctx.fillStyle = "#8899aa";
+    ctx.fillText(l.label, 22 + i * 90, H - 9);
+  });
+}
+
+setInterval(drawChart, 200);
+
+/* ───────────────────────────────────────────────────────────────
+   Update UI from state_update message
+─────────────────────────────────────────────────────────────────*/
+function applyState(msg) {
+  const snap     = msg.state    || {};
+  const tangible = msg.tangible || {};
+  const stLabel  = (snap.state || "unknown").toLowerCase();
+  const color    = STATE_COLOR[stLabel] || STATE_COLOR.unknown;
+  const conf     = snap.confidence ?? 0;
+
+  // Orb
+  const orb = document.getElementById("orb");
+  orb.style.background  = `radial-gradient(circle at 35% 35%, #ffffff22, ${color})`;
+  orb.style.boxShadow   = `0 0 40px 8px ${color}`;
+
+  // Label
+  const lbl = document.getElementById("state-label");
+  lbl.textContent = stLabel.toUpperCase();
+  lbl.style.color = color;
+
+  // Confidence
+  const pct = Math.round(conf * 100);
+  document.getElementById("conf-pct").textContent = pct + "%";
+  document.getElementById("confidence-fill").style.width      = pct + "%";
+  document.getElementById("confidence-fill").style.background = color;
+
+  // Tangible readouts
+  const led = tangible.led || [0, 0, 0];
+  document.getElementById("led-swatch").style.background = `rgb(${led.join(",")})`;
+  document.getElementById("led-swatch").style.boxShadow  = `0 0 14px 3px rgba(${led.join(",")},0.6)`;
+  document.getElementById("led-value").textContent   = `rgb(${led.join(",")})`;
+  document.getElementById("vib-value").textContent   = tangible.vibration ?? "–";
+  document.getElementById("servo-value").textContent = (tangible.servo ?? "–") + "°";
+
+  const nodes = snap.source_nodes || [];
+  document.getElementById("nodes-value").textContent = nodes.length ? nodes.join(", ") : "–";
+
+  // Push audio debug to chart
+  const debug = snap.debug || {};
+  if (debug.audio_mean) pushSample(debug.audio_mean);
+
+  // Log entry
+  addLog(snap);
+}
+
+/* ───────────────────────────────────────────────────────────────
+   Signal log
+─────────────────────────────────────────────────────────────────*/
+function addLog(snap) {
+  const log = document.getElementById("signal-log");
+  const ts  = new Date(snap.timestamp * 1000).toISOString().substr(11, 12);
+  const nodes = (snap.source_nodes || []).join(",") || "—";
+  const st   = (snap.state || "unknown").toLowerCase();
+  const line = document.createElement("div");
+  line.className = `log-line ${st}`;
+  line.innerHTML = `<span class="ts">${ts}</span><span class="node">[${nodes}]</span><span class="st">${st.toUpperCase()}</span> conf=${Math.round((snap.confidence??0)*100)}%`;
+  log.prepend(line);
+  while (log.children.length > 200) log.lastChild.remove();
+}
+
+/* ───────────────────────────────────────────────────────────────
+   WebSocket connection
+─────────────────────────────────────────────────────────────────*/
+let ws = null;
+let reconnectTimer = null;
+
+function connect() {
+  const badge = document.getElementById("conn-badge");
+  badge.className = "dead";
+  badge.textContent = "connecting…";
+
+  ws = new WebSocket(WS_URL);
+
+  ws.onopen = () => {
+    badge.className = "live";
+    badge.textContent = "live";
+    if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
+  };
+
+  ws.onmessage = (ev) => {
+    try {
+      const msg = JSON.parse(ev.data);
+      if (msg.type === "state_update" || msg.type === "connected") {
+        applyState(msg);
+      }
+    } catch(e) { /* ignore malformed */ }
+  };
+
+  ws.onclose = () => {
+    badge.className = "dead";
+    badge.textContent = "disconnected";
+    reconnectTimer = setTimeout(connect, 3000);
+  };
+
+  ws.onerror = () => { ws.close(); };
+}
+
+connect();
+
+/* ───────────────────────────────────────────────────────────────
+   Simulate buttons
+─────────────────────────────────────────────────────────────────*/
+
+// Signal presets that will produce the desired state classification
+const SIM_PRESETS = {
+  calm    : { rms: 0.04, zcr: 0.05, centroid: 800  },
+  curious : { rms: 0.07, zcr: 0.15, centroid: 1200 },
+  active  : { rms: 0.20, zcr: 0.11, centroid: 1800 },
+  alert   : { rms: 0.18, zcr: 0.10, centroid: 3200 },
+  chaotic : { rms: 0.30, zcr: 0.25, centroid: 4000 },
+};
+
+document.querySelectorAll(".sim-btn").forEach(btn => {
+  btn.addEventListener("click", async () => {
+    const state = btn.dataset.state;
+    const feats = SIM_PRESETS[state] || SIM_PRESETS.calm;
+
+    const payload = {
+      node_id    : "dashboard-sim",
+      source_type: "audio",
+      timestamp  : Date.now() / 1000,
+      features   : feats,
+    };
+
+    try {
+      const res = await fetch(BACKEND + "/api/signals", {
+        method  : "POST",
+        headers : { "Content-Type": "application/json" },
+        body    : JSON.stringify(payload),
+      });
+      if (!res.ok) console.error("sim inject failed:", res.status);
+    } catch(e) {
+      console.error("sim inject error:", e);
+    }
+  });
+});
+</script>
+</body>
+</html>

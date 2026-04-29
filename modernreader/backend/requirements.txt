@@ -1,0 +1,18 @@
+# ModernReader Backend — Python dependencies
+#
+# Install with:  pip install -r requirements.txt
+
+# Core
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+pydantic>=2.0.0
+websockets>=12.0
+
+# Signal processing
+numpy>=1.26.0
+scipy>=1.13.0
+librosa>=0.10.0
+sounddevice>=0.4.6
+
+# Config
+PyYAML>=6.0.1
