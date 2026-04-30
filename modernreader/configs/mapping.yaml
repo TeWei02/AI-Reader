@@ -1,0 +1,51 @@
+# ModernReader — Mapping Configuration
+#
+# Maps each StateLabel to a set of tangible output parameters.
+#
+# led:       [R, G, B]   0–255
+# vibration: PWM value   0–255 (sent as analogWrite to motor driver)
+# servo:     angle       0–180 degrees
+# label:     human-readable tag for dashboard / logging
+#
+# Future fields (uncomment when hardware is ready):
+#   audio_file: "calm_ambient.wav"
+#   ar_scene:   "floating_particles"
+#   podcast_prompt: "speak softly about stillness"
+
+states:
+
+  calm:
+    led:       [0, 60, 80]      # teal-blue, slow glow
+    vibration: 0
+    servo:     80               # relaxed mid position
+    label:     "calm"
+
+  curious:
+    led:       [0, 120, 200]    # bright cyan
+    vibration: 30               # very light pulse
+    servo:     100              # slight lean forward
+    label:     "curious"
+
+  active:
+    led:       [0, 200, 50]     # bright green, jumping
+    vibration: 80               # medium pulse
+    servo:     110              # forward posture
+    label:     "active"
+
+  alert:
+    led:       [255, 40, 0]     # orange-red
+    vibration: 180              # strong pulse
+    servo:     150              # high angle / raised
+    label:     "alert"
+
+  chaotic:
+    led:       [180, 0, 255]    # purple strobe effect
+    vibration: 200              # intense pulse
+    servo:     40               # erratic low angle
+    label:     "chaotic"
+
+  unknown:
+    led:       [20, 20, 20]     # dim white
+    vibration: 0
+    servo:     90               # neutral centre
+    label:     "unknown"
