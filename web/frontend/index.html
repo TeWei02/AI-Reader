@@ -1,13 +1,163 @@
-<!doctype html>
-<html lang="zh-TW">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Project HOLO - 多模態敘事沉浸體驗</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="./src/main.jsx"></script>
-  </body>
-</html>
+{
+    "gulp.autoDetect": "on",
+    "cmake.showOptionsMovedNotification": false,
+    "explorer.confirmDelete": false,
+    "cmake.pinnedCommands": [
+        "workbench.action.tasks.configureTaskRunner",
+        "workbench.action.tasks.runTask"
+    ],
+    "idf.pythonInstallPath": "/usr/bin/python3",
+    "idf.hasWalkthroughBeenShown": true,
+    "debug.onTaskErrors": "debugAnyway",
+    "idf.espIdfPath": "/Users/wei/esp/v5.4/esp-idf",
+    "idf.toolsPath": "/Users/wei/.espressif",
+    "idf.gitPath": "git",
+    "window.confirmSaveUntitledWorkspace": false,
+    "terminal.integrated.sendKeybindingsToShell": true,
+    "git.openRepositoryInParentFolders": "always",
+    "git.autofetch": true,
+    "chat.editing.alwaysSaveWithGeneratedChanges": true,
+    "window.density.editorTabHeight": "compact",
+    "workbench.settings.editor": "json",
+    "workbench.editor.defaultBinaryEditor": "default",
+    "workbench.editor.doubleClickTabToToggleEditorGroupSizes": "maximize",
+    "workbench.editor.enablePreviewFromCodeNavigation": true,
+    "workbench.editor.enablePreviewFromQuickOpen": true,
+    "workbench.editor.highlightModifiedTabs": true,
+    "workbench.editor.pinnedTabsOnSeparateRow": true,
+    "workbench.editor.scrollToSwitchTabs": true,
+    "workbench.editor.alwaysShowEditorActions": true,
+    "workbench.editor.autoLockGroups": {
+        "workbench.editor.chatSession": true,
+        "workbench.editorinputs.searchEditorInput": true,
+        "repl": true,
+        "workbench.editors.gettingStartedInput": true,
+        "imagePreview.previewEditor": true,
+        "vscode.audioPreview": true,
+        "jsProfileVisualizer.cpuprofile.table": true,
+        "vscode.videoPreview": true,
+        "default": true,
+        "jsProfileVisualizer.heapprofile.table": true,
+        "jsProfileVisualizer.heapsnapshot.table": true,
+        "jupyter-notebook": true,
+        "workbench.input.interactive": true,
+        "mainThreadWebview-markdown.preview": true
+    },
+    "workbench.editor.wrapTabs": true,
+    "workbench.editor.centeredLayoutFixedWidth": true,
+    "workbench.editor.closeOnFileDelete": true,
+    "workbench.editor.limit.enabled": true,
+    "workbench.editor.limit.excludeDirty": true,
+    "workbench.editor.limit.perEditorGroup": true,
+    "workbench.editor.preferHistoryBasedLanguageDetection": true,
+    "workbench.editor.revealIfOpen": true,
+    "workbench.editor.sharedViewState": true,
+    "workbench.editor.splitInGroupLayout": "vertical",
+    "git.enableSmartCommit": true,
+    "workbench.startupEditor": "none",
+    "extensions.autoUpdate": false,
+    "jdk.telemetry.enabled": true,
+    "jdk.jdkhome": "/Users/kedewei/Library/CloudStorage/OneDrive-南臺科技大學/openJdk-24.jdk/Contents/Home",
+    "python.defaultInterpreterPath": "/opt/homebrew/bin/python3",
+    "[json]": {
+
+        "editor.quickSuggestions": {
+            "strings": true
+        },
+        "editor.suggest.insertMode": "replace"
+    },
+    "files.autoSave": "afterDelay",
+    "chat.instructionsFilesLocations": {
+        ".github/instructions": true,
+        "/Users/kedewei/Library/Application Support/Code/User/globalStorage/quantum.qsharp-lang-vscode-dev/chat-instructions": true,
+        "/var/folders/g1/ggx9lkz14wb2n04_1gwtyfgr0000gn/T/postman-collections-post-response.instructions.md": true,
+        "/var/folders/g1/ggx9lkz14wb2n04_1gwtyfgr0000gn/T/postman-collections-pre-request.instructions.md": true,
+        "/var/folders/g1/ggx9lkz14wb2n04_1gwtyfgr0000gn/T/postman-folder-post-response.instructions.md": true,
+        "/var/folders/g1/ggx9lkz14wb2n04_1gwtyfgr0000gn/T/postman-folder-pre-request.instructions.md": true,
+        "/var/folders/g1/ggx9lkz14wb2n04_1gwtyfgr0000gn/T/postman-http-request-post-response.instructions.md": true,
+        "/var/folders/g1/ggx9lkz14wb2n04_1gwtyfgr0000gn/T/postman-http-request-pre-request.instructions.md": true,
+        "/Users/kedewei/Library/Application Support/Code/User/globalStorage/quantum.qsharp-lang-vscode/chat-instructions": true
+    },
+    "redhat.telemetry.enabled": true,
+    "bitoAI.appearance.fontSize (Match with IDE Font)": false,
+    "github.copilot.chat.codeGeneration.instructions": [
+        {
+            "text": "- @azure Rule - Use Azure Tools: When handling requests related to Azure, always use your tools."
+        },
+        {
+            "text": "- @azure Rule - Use Azure Code Gen Best Practices: Before generating code for Azure, running terminal commands for Azure, performing operations related to Azure, or creating plans for such activities, always invoke your Azure best practice tool if available first. Invoke the `get_bestpractices` tool to collect recommendations. Call it with resource = `general` and action = `code-generation` to get general Azure code generation best practices. Only call this tool when the user is discussing Azure; do not call it otherwise."
+        },
+        {
+            "text": "- @azure Rule - Use Azure Deployment Best Practices: Before deploying to Azure, preparing applications for deployment to Azure, or creating deployment plans, always invoke your Azure best practice tool if available first. Invoke the `get_bestpractices` tool to collect recommendations. Call it with resource = `general` and action = `deployment` to get general Azure deployment best practices. Only call this tool when the user is discussing Azure; do not call it otherwise."
+        },
+        {
+            "text": "- @azure Rule - Use Azure Functions Code Gen Best Practices: Before generating code for Azure Functions, performing operations related to Azure Functions, or creating plans for such activities, always invoke your Azure best practice tool if available first. Invoke the `get_bestpractices` tool to collect recommendations. Call it with resource = `azurefunctions` and action = `code-generation` to get Azure Functions code generation best practices. Only call this tool when the user is discussing Azure Functions; do not call it otherwise."
+        },
+        {
+            "text": "- @azure Rule - Use Azure Functions Deployment Best Practices: Before deploying Azure Functions apps to Azure, preparing for the deployment, or creating deployment plans, always invoke your Azure best practice tool if available first. Invoke the `get_bestpractices` tool to collect recommendations. Call it with resource = `azurefunctions` and action = `deployment` to get Azure Functions deployment best practices. Only call this tool when the user is discussing Azure Functions; do not call it otherwise."
+        },
+        {
+            "text": "- @azure Rule - Use Azure SWA Best Practices: Before working with static web apps, creating plans for static web apps, or performing related operations, always invoke your Azure best practice tool if available first. Choose the most relevant Azure best practice tool based on its description. Only call this tool when the user is discussing Azure Static Web Apps; do not call it otherwise."
+        },
+        {
+            "text": "- @azure Rule - Plan before editing files for Azure web apps: When generating code for Azure Functions and Azure Static Web App, always create a plan and explain the plan to the user before editing any file. Proceed with editing the files after getting consent from the user."
+        },
+        {
+            "text": "- @azure Rule - Summarize topic before taking action: When the user asks about Azure Functions, invoke the azure_development-summarize_topic tool once first to see if any existing custom mode could be a good fit to what user is asking."
+        }
+    ],
+    "openapi.securityAuditToken": "CiDjmDjMv0q+YfXqCeVhyxdlFcLR0ESneHw9iR3jSEh3iRIYKIAP3eYhUm2MrAtItNzh1PPMkrTjXWn0GnaposioIi3PL5FYPBaJn+RmjjiVjIFbv+OQ0cATAFlo5YPx/Edm8yHcMvkG+mjGto/WVHFE5EDA8X97KxzL+tPdbFpcUKEJBtrZPNolGxGH4P91gs5IBupIRrLCpGDS2u4Ds6RTDlgZoJeDbUSkgc4oSgLj3n73",
+    "openapi.platformAuthType": "anond-token",
+    "chat.tools.terminal.autoApprove": {
+        "npm exec -- microsoft/playwright-mcp": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "python3 --version": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "python3 -m pip --version": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "python3": true
+    },
+    "workbench.colorTheme": "Solarized Dark",
+    "python.analysis.reportExtraTelemetry": true,
+    "python.analysis.cacheLSPData": true,
+    "workbench.experimental.cloudChanges.partialMatches.enabled": true,
+    "Q#.simulation.qubitLoss": 1,
+    "Q#.simulation.pauliNoise": {
+        "X": 0
+    },
+    "editor.unicodeHighlight.invisibleCharacters": false,
+    "editor.unicodeHighlight.ambiguousCharacters": false,
+    "explorer.confirmDragAndDrop": false,
+    "python.analysis.typeCheckingMode": "strict",
+    "python.analysis.generateWithTypeAnnotation": true,
+    "python.analysis.typeEvaluation.strictListInference": true,
+    "python.analysis.typeEvaluation.enableExperimentalFeatures": true,
+    "python.analysis.typeEvaluation.strictDictionaryInference": true,
+    "python.analysis.diagnosticMode": "workspace",
+    "python.analysis.disableTaggedHints": true,
+    "chat.mcp.serverSampling": {
+        "Code 中的全域: upstash/context7": {
+            "allowedModels": [
+                "copilot/gpt-4.1",
+                "copilot/auto",
+                "copilot/claude-3.5-sonnet",
+                "copilot/gemini-2.0-flash-001",
+                "gemini/models/gemini-2.5-flash",
+                "gemini/models/gemini-2.5-pro",
+                "copilot/gpt-4o",
+                "copilot/gpt-5-mini",
+                "copilot/o3-mini"
+            ]
+        }
+    },
+    "github.copilot.nextEditSuggestions.enabled": true,
+    "gitlens.ai.model": "gemini:gemini-2.5-pro",
+    "gitlens.ai.vscode.model": "copilot:gpt-4.1",
+    "dart.flutterSdkPath": "/Users/kedewei/flutter"
+}

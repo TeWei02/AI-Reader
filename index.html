@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI多感官智能閱讀器 | 互動專案報告</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Solarized Calm -->
+    <!-- Application Structure Plan: The SPA is designed with a narrative, thematic flow rather than mirroring the report's formal structure. It begins with a Hero section for immediate impact, followed by "The Vision" to establish the 'why'. The core technology is presented in an interactive "HSP Engine Deep Dive" section, allowing users to explore complex components without being overwhelmed. This is followed by tangible "Current Progress" with data visualization, and an inspiring "Future Vision" section using a card-based layout to showcase exciting future goals. This top-down, from-vision-to-details-to-future structure is more engaging and intuitive for a web-based presentation, guiding the user through a story rather than a static document. -->
+    <!-- Visualization & Content Choices: 
+        - Vision Section -> Goal: Inform -> Viz: Icon-based cards -> Interaction: Hover highlight -> Justification: Visually separates and emphasizes the two core philosophies. -> Method: HTML/Tailwind.
+        - HSP Engine -> Goal: Organize/Explain -> Viz: Interactive diagram using HTML/CSS -> Interaction: Click on components to display details in a dedicated panel -> Justification: Makes complex architecture explorable and digestible. -> Method: HTML/Tailwind/JS.
+        - MOS Score -> Goal: Inform/Compare -> Viz: Horizontal Bar Chart -> Interaction: Tooltip on hover -> Justification: Provides a clear, quantitative metric of the prototype's success. -> Library: Chart.js/Canvas.
+        - Future Goals -> Goal: Inspire -> Viz: Grid of icon-based cards -> Interaction: Static cards for clarity -> Justification: Presents a high-level, exciting overview of future plans in a scannable format. -> Method: HTML/Tailwind.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #fcfaf5;
+            color: #586e75;
+        }
+        .accent-bg { background-color: #268bd2; }
+        .accent-text { color: #268bd2; }
+        .secondary-accent-bg { background-color: #859900; }
+        .secondary-accent-text { color: #859900; }
+        .subtle-bg { background-color: #f5f1e8; }
+        .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05); }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 200px;
+            max-height: 250px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 300px;
+                max-height: 350px;
+            }
+        }
+        .tab-active {
+            border-color: #268bd2;
+            color: #268bd2;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <header class="accent-bg text-white p-4 sticky top-0 z-50 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold">AI多感官智能閱讀器</h1>
+            <nav class="hidden md:flex space-x-6 font-medium">
+                <a href="#vision" class="hover:text-gray-200">專案願景</a>
+                <a href="#engine" class="hover:text-gray-200">HSP引擎詳解</a>
+                <a href="#progress" class="hover:text-gray-200">開發進度</a>
+                <a href="#future" class="hover:text-gray-200">未來展望</a>
+            </nav>
+            <div class="md:hidden">
+                <select id="mobile-nav" class="bg-white text-gray-800 rounded p-2">
+                    <option value="#hero">首頁</option>
+                    <option value="#vision">專案願景</option>
+                    <option value="#engine">HSP引擎詳解</option>
+                    <option value="#progress">開發進度</option>
+                    <option value="#future">未來展望</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero" class="py-20 md:py-32 text-center bg-cover bg-center" style="background-color: #f5f1e8;">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl md:text-6xl font-bold accent-text mb-4">Holo-Sentient 感知引擎</h2>
+                <p class="text-lg md:text-2xl text-gray-600 max-w-3xl mx-auto">讓知識與情感，在任何情境下都能被感知。我們正在打造一套超越視覺的AI閱讀器，開啟全新的人機互動篇章。</p>
+            </div>
+        </section>
+
+        <section id="vision" class="py-16 md:py-24">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl md:text-4xl font-bold">專案願景</h3>
+                    <p class="mt-4 text-lg text-gray-600">我們的核心理念是將科技與人性結合，解決傳統閱讀的限制。</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8 md:gap-12">
+                    <div class="subtle-bg p-8 rounded-lg card-shadow">
+                        <div class="text-5xl accent-text mb-4">🌍</div>
+                        <h4 class="text-2xl font-bold mb-2">知識面前，人人平等</h4>
+                        <p class="text-gray-600">我們致力於打造一個無障礙的知識環境。無論是視障者、行動不便者，或是因語言文化隔閡而學習受阻的族群，都能透過多感官的互動方式，輕鬆獲取資訊與知識。</p>
+                    </div>
+                    <div class="subtle-bg p-8 rounded-lg card-shadow">
+                        <div class="text-5xl secondary-accent-text mb-4">🤝</div>
+                        <h4 class="text-2xl font-bold mb-2">讓科技暖起來</h4>
+                        <p class="text-gray-600">我們追求的不只是高效的資訊傳遞，更是一種有溫度的情感交流。目標是將人機互動從「工具」關係昇華為「夥伴」關係，讓科技成為促進心理健康、提供情感支持的溫暖媒介。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="engine" class="py-16 md:py-24 subtle-bg">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl md:text-4xl font-bold">HSP引擎互動詳解</h3>
+                    <p class="mt-4 text-lg text-gray-600">點擊下方模組，探索HSP引擎如何感知文字背後的情感與氛圍。</p>
+                </div>
+                <div class="flex flex-col md:flex-row gap-8">
+                    <div class="md:w-1/3">
+                        <div id="engine-tabs" class="flex flex-col space-y-4">
+                            <button data-target="input" class="p-4 text-left text-lg border-l-4 tab-active rounded-r-md bg-white">➡️ 輸入子系統</button>
+                            <button data-target="core" class="p-4 text-left text-lg border-l-4 border-transparent hover:border-gray-300 rounded-r-md bg-white">⚙️ 核心處理引擎</button>
+                            <button data-target="output" class="p-4 text-left text-lg border-l-4 border-transparent hover:border-gray-300 rounded-r-md bg-white">⬅️ 輸出子系統</button>
+                        </div>
+                    </div>
+                    <div class="md:w-2/3 bg-white p-8 rounded-lg card-shadow">
+                        <div id="engine-details">
+                            <div id="detail-input">
+                                <h4 class="text-2xl font-bold accent-text mb-4">輸入子系統 (Input Subsystems)</h4>
+                                <p class="mb-4 text-gray-600">這是HSP引擎感知世界的起點，它從多個維度接收資訊，不僅僅是文字。</p>
+                                <ul class="space-y-3 list-disc list-inside">
+                                    <li><strong>文字解析：</strong> 讀懂您提供的文本、文章。</li>
+                                    <li><strong>語音辨識與韻律分析：</strong> 不只聽懂您說話的內容，更能分析您的語氣情感。</li>
+                                    <li><strong>生物特徵感測：</strong> 連接智慧手錶等穿戴裝置，讀取心跳等生理訊號，了解您的即時情緒狀態。</li>
+                                </ul>
+                            </div>
+                            <div id="detail-core" class="hidden">
+                                <h4 class="text-2xl font-bold accent-text mb-4">核心處理：HSP引擎 (Core Processing)</h4>
+                                <p class="mb-4 text-gray-600">這裡是系統的心臟與大腦。它將接收到的資訊轉化為豐富的多感官訊號。</p>
+                                <ul class="space-y-3 list-disc list-inside">
+                                    <li><strong>動態語音生成：</strong> 像真人說書一樣，根據劇情起伏調整語音語調。</li>
+                                    <li><strong>情感回饋迴路：</strong> 偵測您的情緒，若您感到疲憊，系統會自動放慢語速或切換音色。</li>
+                                    <li><strong>觸覺語法映射：</strong> 將標點符號轉為震動，讓您用皮膚「感覺」文章的節奏。</li>
+                                    <li><strong>多模態訊號輸出：</strong> 根據文本情境，觸發氣味、震動等訊號，創造身歷其境的體驗。</li>
+                                </ul>
+                            </div>
+                            <div id="detail-output" class="hidden">
+                                <h4 class="text-2xl font-bold accent-text mb-4">輸出子系統 (Output Subsystems)</h4>
+                                <p class="mb-4 text-gray-600">將引擎處理後的結果，以最真實、最沉浸的方式呈現給您。</p>
+                                <ul class="space-y-3 list-disc list-inside">
+                                    <li><strong>聽覺輸出：</strong> 播放充滿情感與溫度的聲音。</li>
+                                    <li><strong>觸覺回饋：</strong> 透過觸覺背心或手環，讓您「摸到」故事的節奏與情緒。</li>
+                                    <li><strong>環境模擬：</strong> 控制氣味產生器等外部設備，讓書中描寫的味道真實地飄散在空氣中！</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="progress" class="py-16 md:py-24">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl md:text-4xl font-bold">開發進度與原型</h3>
+                    <p class="mt-4 text-lg text-gray-600">我們已在Hugging Face平台部署了兩款原型，以驗證核心功能。</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="subtle-bg p-8 rounded-lg card-shadow">
+                        <h4 class="text-2xl font-bold mb-2">1. my-reader-gpt</h4>
+                        <span class="inline-block bg-blue-100 text-blue-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded">聲音核心測試版</span>
+                        <p class="mt-4 text-gray-600">此版本專注於將文字轉化為高品質、聽感自然的語音。我們成功解決了長篇文本生成中的韻律與一致性問題，為後續開發奠定了穩固基石。</p>
+                        <div class="mt-6">
+                            <p class="font-bold text-gray-700">語音自然度(MOS)評分:</p>
+                            <div class="chart-container">
+                                <canvas id="mosChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="subtle-bg p-8 rounded-lg card-shadow">
+                        <h4 class="text-2xl font-bold mb-2">2. holo-reader-final</h4>
+                        <span class="inline-block bg-green-100 text-green-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded">多感官整合測試版</span>
+                        <p class="mt-4 text-gray-600">作為更進階的版本，此原型開始整合多模態訊號映射。我們正聚焦於建立一套演算法，將文本中抽象的情緒（如懸疑、喜悅）有效轉譯為具體的觸覺、嗅覺等非視覺訊號。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="future" class="py-16 md:py-24 subtle-bg">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl md:text-4xl font-bold">未來展望</h3>
+                    <p class="mt-4 text-lg text-gray-600">我們的終極夢想是打造一個真正懂您的AI閱讀夥伴，以下是我們想挑戰的瘋狂點子！</p>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="bg-white p-6 rounded-lg card-shadow text-center">
+                        <div class="text-4xl mb-3">🧠</div>
+                        <h5 class="text-xl font-bold">腦波直接讀取</h5>
+                        <p class="text-sm text-gray-600 mt-2">整合EEG技術，直接從腦波判斷您的專注與放鬆狀態，實現毫秒級的互動反應。</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg card-shadow text-center">
+                        <div class="text-4xl mb-3">🎯</div>
+                        <h5 class="text-xl font-bold">情境感知推薦</h5>
+                        <p class="text-sm text-gray-600 mt-2">不僅根據您的偏好，更能結合當下心境推薦內容。心情不好時，為您送上溫暖的故事。</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg card-shadow text-center">
+                        <div class="text-4xl mb-3">✍️</div>
+                        <h5 class="text-xl font-bold">創作者生態系</h5>
+                        <p class="text-sm text-gray-600 mt-2">提供工具，讓作家能為作品嵌入「感官特效」，催生全新的互動式內容創作。</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg card-shadow text-center">
+                        <div class="text-4xl mb-3">🧊</div>
+                        <h5 class="text-xl font-bold">可編程物質</h5>
+                        <p class="text-sm text-gray-600 mt-2">將故事「召喚」到現實！讓您親手觸摸到書中描寫的山丘或動物的質感。</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg card-shadow text-center">
+                        <div class="text-4xl mb-3">✨</div>
+                        <h5 class="text-xl font-bold">互動動態投影</h5>
+                        <p class="text-sm text-gray-600 mt-2">將動畫投影到日常物品上，讓您桌上的馬克杯冒出書中描寫的熱氣，模糊現實與故事的界線。</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg card-shadow text-center">
+                        <div class="text-4xl mb-3">🔋</div>
+                        <h5 class="text-xl font-bold">次世代能源</h5>
+                        <p class="text-sm text-gray-600 mt-2">導入微型核電池或量子充電技術，實現真正的無線自由，讓裝置永遠陪伴在您身邊。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto text-center px-6">
+            <p class="font-bold">「AI多感官智能閱讀器」專案</p>
+            <p class="text-sm mt-2">呈報人：柯德瑋 (TE-WEI KO)</p>
+            <p class="text-sm mt-2">指導教授：盧文翔 教授</p>
+            <p class="text-xs text-gray-400 mt-1">MI²S Lab | NCKU CSIE | 2025</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const mobileNav = document.getElementById('mobile-nav');
+            mobileNav.addEventListener('change', (event) => {
+                const targetId = event.target.value;
+                document.querySelector(targetId).scrollIntoView({ behavior: 'smooth' });
+            });
+
+            const engineTabs = document.getElementById('engine-tabs');
+            const engineDetails = document.getElementById('engine-details');
+            const detailPanels = engineDetails.querySelectorAll('div[id^="detail-"]');
+
+            engineTabs.addEventListener('click', (event) => {
+                const button = event.target.closest('button');
+                if (!button) return;
+
+                const targetId = button.dataset.target;
+                
+                engineTabs.querySelectorAll('button').forEach(btn => {
+                    btn.classList.remove('tab-active');
+                    btn.classList.add('border-transparent');
+                });
+                button.classList.add('tab-active');
+                button.classList.remove('border-transparent');
+
+                detailPanels.forEach(panel => {
+                    if (panel.id === `detail-${targetId}`) {
+                        panel.classList.remove('hidden');
+                    } else {
+                        panel.classList.add('hidden');
+                    }
+                });
+            });
+
+            const mosCtx = document.getElementById('mosChart').getContext('2d');
+            new Chart(mosCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['my-reader-gpt 自然度'],
+                    datasets: [{
+                        label: 'MOS (平均意見分數)',
+                        data: [4.3],
+                        backgroundColor: ['rgba(38, 139, 210, 0.6)'],
+                        borderColor: ['rgba(38, 139, 210, 1)'],
+                        borderWidth: 1,
+                        barPercentage: 0.5,
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 5,
+                            title: {
+                                display: true,
+                                text: '分數 (越高越好)'
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                autoSkip: false,
+                                callback: function(value) {
+                                    const label = this.getLabelForValue(value);
+                                    if (label.length > 16) {
+                                        return label.slice(0, 16) + '...';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.x !== null) {
+                                        label += context.parsed.x.toFixed(1) + ' / 5.0';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
