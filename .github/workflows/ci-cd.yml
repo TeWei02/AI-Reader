@@ -32,13 +32,11 @@ jobs:
       
       - name: Run linting
         run: |
-          pip install flake8
           flake8 holo/ --count --select=E9,F63,F7,F82 --show-source --statistics
           flake8 holo/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       
       - name: Run tests with coverage
         run: |
-          pip install pytest pytest-cov
           pytest tests/ -v --cov=holo --cov-report=xml --cov-report=html
       
       - name: Upload coverage reports
@@ -73,7 +71,7 @@ jobs:
       
       - name: Run tests
         working-directory: web/frontend
-        run: npm test -- --coverage
+        run: npm test -- --run
       
       - name: Build
         working-directory: web/frontend

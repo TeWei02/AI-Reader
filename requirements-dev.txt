@@ -8,3 +8,4 @@ flake8
 
 # 測試框架
 pytest
+pytest-cov
