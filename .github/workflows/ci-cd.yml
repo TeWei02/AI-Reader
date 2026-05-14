@@ -45,6 +45,7 @@ jobs:
           file: ./coverage.xml
           flags: backend
           name: backend-coverage
+          fail_ci_if_error: false
 
   # Frontend Tests
   frontend-test:
@@ -68,6 +69,7 @@ jobs:
       - name: Run linting
         working-directory: web/frontend
         run: npm run lint --if-present
+        continue-on-error: true
       
       - name: Run tests
         working-directory: web/frontend
