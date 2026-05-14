@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Project H.O.L.O. × ModernReader — Demo</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
@@ -383,9 +383,9 @@
 
 <!-- Navigation -->
 <div id="nav">
-  <button class="nbtn" id="btn-p">‹</button>
+  <button class="nbtn" id="btn-p" aria-label="上一張">‹</button>
   <div id="dots"></div>
-  <button class="nbtn" id="btn-n">›</button>
+  <button class="nbtn" id="btn-n" aria-label="下一張">›</button>
   <span id="ctr"></span>
 </div>
 
@@ -423,7 +423,7 @@ function go(idx) {
     s.style.opacity = i === cur ? '1' : '0.4';
   });
   dotEls.forEach((d, i) => d.className = 'dot' + (i === cur ? ' on' : ''));
-  pbar.style.width = `${(cur / (N - 1)) * 100}%`;
+  pbar.style.width = N > 1 ? (cur / (N - 1)) * 100 + '%' : '100%';
   ctr.textContent = `${cur + 1} / ${N}`;
   if (cur === 3) startDemo(); else stopDemo();
   if (cur === 4) initMos();
@@ -434,6 +434,7 @@ go(0);
 document.getElementById('btn-p').addEventListener('click', () => go(cur - 1));
 document.getElementById('btn-n').addEventListener('click', () => go(cur + 1));
 document.addEventListener('keydown', e => {
+  if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
   if (e.key === 'ArrowRight' || e.key === 'ArrowDown')  go(cur + 1);
   if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')    go(cur - 1);
 });
