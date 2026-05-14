@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project H.O.L.O. × ModernReader — Demo</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --solar-bg: #fcfaf5;
+      --solar-text: #586e75;
+      --solar-blue: #268bd2;
+      --solar-green: #859900;
+      --solar-subtle: #f5f1e8;
+      --dash-bg: #0a0d14;
+      --dash-surface: #12161f;
+      --dash-border: #1e2636;
+      --dash-text: #c8d0e0;
+      --dash-muted: #4a5568;
+      --calm: #00c8d4;
+      --curious: #00aaff;
+      --active: #00e064;
+      --alert: #ff5020;
+      --chaotic: #cc00ff;
+      --unknown: #445566;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; font-family: 'Noto Sans TC', 'Inter', sans-serif; }
+
+    /* ── Slide system ── */
+    #stage {
+      width: 100%;
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+    .slide {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 56px 48px 72px;
+      overflow-y: auto;
+      transition: transform 0.55s cubic-bezier(0.77,0,0.175,1), opacity 0.45s ease;
+      will-change: transform, opacity;
+    }
+    .slide-cover { background: linear-gradient(145deg,#0a0d14 0%,#0d1a2e 55%,#0a0d14 100%); color:#e2e8f0; }
+    .slide-solar { background: var(--solar-bg); color: var(--solar-text); }
+    .slide-dash  { background: var(--dash-bg);  color: var(--dash-text); }
+
+    /* ── Nav bar ── */
+    #nav {
+      position: fixed; bottom:0; left:0; right:0; height:56px;
+      display:flex; align-items:center; justify-content:center; gap:14px;
+      z-index:200;
+      background: rgba(0,0,0,0.35);
+      backdrop-filter: blur(10px);
+    }
+    .nbtn {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: #fff; padding: 5px 20px; border-radius: 20px;
+      cursor: pointer; font-size:1.1rem; transition: background .2s;
+      font-family: inherit;
+    }
+    .nbtn:hover { background: rgba(255,255,255,0.28); }
+    .dot {
+      width:8px; height:8px; border-radius:50%;
+      background: rgba(255,255,255,0.28);
+      cursor:pointer; transition: background .3s, transform .2s;
+    }
+    .dot.on { background:#fff; transform:scale(1.35); }
+    #ctr { color:rgba(255,255,255,0.5); font-size:0.78rem; min-width:36px; text-align:center; }
+
+    /* ── Progress bar ── */
+    #pbar {
+      position:fixed; top:0; left:0; height:3px;
+      background: var(--solar-blue);
+      transition: width .4s ease;
+      z-index:201;
+    }
+
+    /* ─── Slide 1 – Cover ─── */
+    .cover-title {
+      font-size:4.8rem; font-weight:700; letter-spacing:.05em;
+      color:#3b82f6; text-shadow:0 0 48px rgba(59,130,246,.55);
+      text-align:center; line-height:1;
+    }
+    .cover-sub-title { font-size:1rem; color:#3b82f6; letter-spacing:.18em; margin-top:6px; text-align:center; }
+    .cover-tag  { font-size:1.2rem; color:#94a3b8; max-width:580px; text-align:center; margin:18px 0 36px; line-height:1.75; }
+    .cover-chips { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+    .chip { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.13); color:#94a3b8; padding:5px 14px; border-radius:99px; font-size:.8rem; }
+    .cover-foot { margin-top:44px; font-size:.75rem; color:#334155; text-align:center; }
+
+    /* ─── Slide 2 – Vision ─── */
+    .s-title  { font-size:2.2rem; font-weight:700; text-align:center; color:#2a3a42; margin-bottom:.4rem; }
+    .s-sub    { font-size:1rem; opacity:.65; text-align:center; margin-bottom:1.8rem; }
+    .v-grid   { display:grid; grid-template-columns:1fr 1fr; gap:20px; max-width:860px; width:100%; }
+    .v-card   { background:var(--solar-subtle); border-radius:12px; padding:28px; box-shadow:0 3px 10px rgba(0,0,0,.07); }
+    .v-card .ico { font-size:2.4rem; margin-bottom:10px; }
+    .v-card h4  { font-size:1.1rem; font-weight:700; margin-bottom:8px; color:#2a3a42; }
+    .v-card p   { font-size:.88rem; line-height:1.7; }
+
+    /* ─── Slide 3 – HSP Engine ─── */
+    .eng-wrap { display:grid; grid-template-columns:200px 1fr; gap:20px; max-width:860px; width:100%; }
+    .tab-col  { display:flex; flex-direction:column; gap:8px; }
+    .tbn {
+      display:block; width:100%; text-align:left;
+      padding:12px 16px; border:none;
+      border-left:4px solid transparent;
+      background:var(--solar-subtle); color:var(--solar-text);
+      font-size:.88rem; cursor:pointer;
+      border-radius:0 8px 8px 0; transition:all .2s;
+      font-family:inherit;
+    }
+    .tbn.on { border-left-color:var(--solar-blue); color:var(--solar-blue); font-weight:700; background:#edf4fc; }
+    .eng-detail { background:#fff; border-radius:12px; padding:26px; box-shadow:0 3px 10px rgba(0,0,0,.07); }
+    .eng-detail h4 { font-size:1.15rem; font-weight:700; color:var(--solar-blue); margin-bottom:10px; }
+    .eng-detail p  { font-size:.88rem; margin-bottom:12px; }
+    .eng-detail li { font-size:.88rem; margin:7px 0 7px 20px; line-height:1.65; }
+    .dp { display:none; } .dp.on { display:block; }
+
+    /* ─── Slide 4 – Dashboard ─── */
+    .dash-hdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; width:100%; max-width:960px; }
+    .dash-hdr h2 { font-size:1rem; letter-spacing:.05em; color:#e2e8f0; }
+    #conn-badge {
+      font-size:.68rem; padding:3px 10px; border-radius:99px;
+      background:#1e2636; border:1px solid #ef4444; color:#ef4444;
+    }
+    .dash-grid {
+      display:grid;
+      grid-template-columns:240px 1fr;
+      grid-template-rows:auto auto;
+      gap:14px;
+      max-width:960px; width:100%;
+    }
+    .dp2 {
+      background:var(--dash-surface); border:1px solid var(--dash-border);
+      border-radius:10px; padding:16px;
+    }
+    .dp2-title { font-size:.62rem; letter-spacing:.12em; text-transform:uppercase; color:var(--dash-muted); margin-bottom:12px; }
+    #orb {
+      width:88px; height:88px; border-radius:50%;
+      background:radial-gradient(circle at 35% 35%,#ffffff22,var(--unknown));
+      box-shadow:0 0 36px 8px var(--unknown);
+      transition:background .6s, box-shadow .6s;
+      margin:0 auto 10px;
+    }
+    #state-lbl {
+      font-size:1.3rem; font-weight:700; letter-spacing:.08em;
+      text-transform:uppercase; color:var(--unknown);
+      text-align:center; transition:color .5s;
+    }
+    .conf-wrap { margin-top:10px; }
+    .conf-lbl  { display:flex; justify-content:space-between; font-size:.62rem; color:var(--dash-muted); margin-bottom:4px; }
+    .conf-trk  { background:var(--dash-border); border-radius:4px; height:5px; overflow:hidden; }
+    #conf-fill { height:100%; background:var(--unknown); width:0%; transition:width .5s, background .5s; }
+    .rout-grid { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-top:12px; }
+    .rout { background:#0d1117; border:1px solid var(--dash-border); border-radius:8px; padding:7px; text-align:center; }
+    .rl   { font-size:.58rem; color:var(--dash-muted); letter-spacing:.07em; text-transform:uppercase; }
+    .rv   { font-size:1rem; font-weight:700; margin-top:2px; color:#e2e8f0; }
+    #led-sw {
+      width:28px; height:28px; border-radius:50%;
+      background:#141414; box-shadow:0 0 10px 2px #141414;
+      margin:2px auto 2px; transition:background .5s, box-shadow .5s;
+    }
+    #feat-canvas { display:block; width:100%; height:140px; }
+    .sim-row { display:flex; flex-wrap:wrap; gap:7px; }
+    .smbtn {
+      flex:1 1 70px; padding:7px 10px; border-radius:8px;
+      border:1px solid var(--dash-border);
+      background:#0d1117; color:var(--dash-text);
+      cursor:pointer; font-size:.72rem; letter-spacing:.04em;
+      transition:background .2s; font-family:inherit;
+    }
+    .smbtn:hover { background:#1a2233; }
+    .smbtn[data-s="calm"]    { border-color:var(--calm); }
+    .smbtn[data-s="curious"] { border-color:var(--curious); }
+    .smbtn[data-s="active"]  { border-color:var(--active); }
+    .smbtn[data-s="alert"]   { border-color:var(--alert); }
+    .smbtn[data-s="chaotic"] { border-color:var(--chaotic); }
+
+    /* ─── Slide 5 – Progress ─── */
+    .prog-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; max-width:860px; width:100%; }
+    .pg-card   { background:var(--solar-subtle); border-radius:12px; padding:22px; }
+    .pg-card h4 { font-weight:700; margin-bottom:6px; color:#2a3a42; }
+    .badge { display:inline-block; border-radius:99px; padding:2px 10px; font-size:.72rem; font-weight:600; margin-bottom:10px; }
+    .b-blue  { background:#dbeafe; color:#1e40af; }
+    .b-green { background:#dcfce7; color:#166534; }
+    .stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-top:10px; font-size:.8rem; }
+    .stat-box  { background:#e8f5e9; border-radius:8px; padding:8px; text-align:center; }
+    .stat-n    { font-size:1.3rem; font-weight:700; color:#166534; }
+    .chart-box { position:relative; height:140px; max-width:480px; width:100%; margin:10px auto 0; }
+
+    /* ─── Slide 6 – Future ─── */
+    .fut-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; max-width:860px; width:100%; }
+    .fut-card { background:#fff; border-radius:12px; padding:18px; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,.07); }
+    .fut-card .ico { font-size:2.2rem; margin-bottom:7px; }
+    .fut-card h5   { font-weight:700; margin-bottom:5px; font-size:.95rem; color:#2a3a42; }
+    .fut-card p    { font-size:.78rem; line-height:1.6; }
+  </style>
+</head>
+<body>
+
+<div id="pbar"></div>
+
+<div id="stage">
+
+  <!-- ① Cover -->
+  <section class="slide slide-cover" data-i="0">
+    <div style="text-align:center">
+      <div style="font-size:.82rem;letter-spacing:.22em;color:#334155;text-transform:uppercase;margin-bottom:14px">Interactive Demo</div>
+      <div class="cover-title">H.O.L.O.</div>
+      <div class="cover-sub-title">&times; ModernReader</div>
+      <p class="cover-tag">一套超越視覺的 AI 多感官閱讀引擎<br>重新定義「閱讀」的體驗</p>
+      <div class="cover-chips">
+        <span class="chip">🧠 深度語意分析</span>
+        <span class="chip">🎵 動態語音生成</span>
+        <span class="chip">📳 觸覺回饋映射</span>
+        <span class="chip">⚛️ Semantica 量子框架</span>
+      </div>
+      <div class="cover-foot">MI²S Lab &nbsp;&middot;&nbsp; NCKU CSIE &nbsp;&middot;&nbsp; 2025<br>柯德瑋 &nbsp;·&nbsp; 盧文翔 教授</div>
+    </div>
+  </section>
+
+  <!-- ② Vision -->
+  <section class="slide slide-solar" data-i="1">
+    <h2 class="s-title">專案願景</h2>
+    <p class="s-sub">將科技與人性結合，解決傳統閱讀的限制</p>
+    <div class="v-grid">
+      <div class="v-card"><div class="ico">🌍</div><h4>知識面前，人人平等</h4><p>無論是視障者、行動不便者，或因語言文化隔閡而學習受阻的族群，都能透過多感官互動方式輕鬆獲取知識。</p></div>
+      <div class="v-card"><div class="ico">🤝</div><h4>讓科技暖起來</h4><p>不只是高效的資訊傳遞，更是有溫度的情感交流。讓人機互動從「工具」關係昇華為「夥伴」關係。</p></div>
+      <div class="v-card"><div class="ico">📖</div><h4>重新定義「閱讀」</h4><p>不僅能「閱讀」故事，而是能真正地「感受」它。透過聽覺、觸覺、嗅覺融合，成為故事的一部分。</p></div>
+      <div class="v-card"><div class="ico">🔗</div><h4>ModernReader 語義框架</h4><p>以 Semantica 語言統一前端、後端與 AI Agent，透過 Claw 協議實現多 Agent 零延遲協作。</p></div>
+    </div>
+  </section>
+
+  <!-- ③ HSP Engine -->
+  <section class="slide slide-solar" data-i="2">
+    <h2 class="s-title">HSP 感知引擎架構</h2>
+    <p class="s-sub">點擊模組，探索引擎如何將文字轉化為多感官體驗</p>
+    <div class="eng-wrap">
+      <div class="tab-col">
+        <button class="tbn on" data-tab="inp">➡️ 輸入子系統</button>
+        <button class="tbn"     data-tab="core">⚙️ 核心引擎</button>
+        <button class="tbn"     data-tab="out">⬅️ 輸出子系統</button>
+        <button class="tbn"     data-tab="mr">🔗 ModernReader</button>
+      </div>
+      <div class="eng-detail">
+        <div class="dp on" id="dp-inp">
+          <h4>輸入子系統</h4>
+          <p>HSP 引擎感知世界的起點，從多個維度接收資訊：</p>
+          <ul>
+            <li><strong>文字解析：</strong>讀懂文本，自適應智慧分段（sentences / paragraphs / adaptive）</li>
+            <li><strong>語音辨識 + 韻律分析：</strong>分析語氣情感，不只聽懂內容</li>
+            <li><strong>生物特徵感測：</strong>穿戴裝置即時讀取心跳等生理訊號</li>
+            <li><strong>多語言支援：</strong>中、英及混合語言文本處理</li>
+          </ul>
+        </div>
+        <div class="dp" id="dp-core">
+          <h4>核心處理：HSP 引擎</h4>
+          <p>系統的心臟與大腦，將資訊轉化為多感官訊號：</p>
+          <ul>
+            <li><strong>動態語音生成：</strong>根據劇情起伏調整語調（ElevenLabs TTS + gTTS 備援）</li>
+            <li><strong>情感回饋迴路：</strong>偵測疲憊時自動放慢語速或切換音色</li>
+            <li><strong>觸覺語法映射：</strong>標點符號 → 震動，讓皮膚感覺文章節奏</li>
+            <li><strong>多模態訊號輸出：</strong>根據文本情境觸發氣味、震動等訊號</li>
+          </ul>
+        </div>
+        <div class="dp" id="dp-out">
+          <h4>輸出子系統</h4>
+          <p>將引擎處理後的結果，以最沉浸的方式呈現：</p>
+          <ul>
+            <li><strong>聽覺輸出：</strong>充滿情感與溫度的高品質語音播放</li>
+            <li><strong>觸覺回饋：</strong>觸覺背心或手環，讓身體感受故事節奏與情緒</li>
+            <li><strong>環境模擬：</strong>控制氣味產生器，讓書中描寫的味道真實飄散</li>
+            <li><strong>LED 視覺輔助：</strong>動態燈光隨情感狀態即時呈現</li>
+          </ul>
+        </div>
+        <div class="dp" id="dp-mr">
+          <h4>ModernReader / Semantica 層</h4>
+          <p>統一所有元件通訊的語義框架：</p>
+          <ul>
+            <li><strong>Semantica 語言：</strong>以語義意圖取代 API 呼叫，零樣板代碼</li>
+            <li><strong>Claw 協議：</strong>多 Agent 間的原生通訊，支援量子態傳輸</li>
+            <li><strong>Moltbook 環境：</strong>Agent 共享執行空間與持久化狀態管理</li>
+            <li><strong>量子原語：</strong>內建量子模擬，可直接執行 Grover 搜尋等演算法</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ④ Live Signal Dashboard -->
+  <section class="slide slide-dash" data-i="3">
+    <div class="dash-hdr">
+      <h2>Modern<span style="color:#3b82f6">Reader</span> — Signal Dashboard</h2>
+      <span id="conn-badge">demo mode</span>
+    </div>
+    <div class="dash-grid">
+      <!-- State panel (spans 2 rows) -->
+      <div class="dp2" style="grid-row:1/3;display:flex;flex-direction:column;gap:14px">
+        <div class="dp2-title">Current State</div>
+        <div id="orb"></div>
+        <div id="state-lbl">UNKNOWN</div>
+        <div class="conf-wrap">
+          <div class="conf-lbl"><span>Confidence</span><span id="conf-pct">0%</span></div>
+          <div class="conf-trk"><div id="conf-fill"></div></div>
+        </div>
+        <div class="rout-grid">
+          <div class="rout"><div class="rl">LED</div><div id="led-sw"></div><div id="led-v" class="rv" style="font-size:.6rem">–</div></div>
+          <div class="rout"><div class="rl">Vibration</div><div id="vib-v" class="rv">–</div></div>
+          <div class="rout"><div class="rl">Servo °</div><div id="srv-v" class="rv">–</div></div>
+          <div class="rout"><div class="rl">Source</div><div id="src-v" class="rv" style="font-size:.7rem">–</div></div>
+        </div>
+      </div>
+      <!-- Feature chart -->
+      <div class="dp2">
+        <div class="dp2-title">Audio Features (last 60 samples)</div>
+        <canvas id="feat-canvas"></canvas>
+      </div>
+      <!-- Inject buttons -->
+      <div class="dp2">
+        <div class="dp2-title">Inject Simulated Signal — 點擊切換情緒狀態</div>
+        <div class="sim-row">
+          <button class="smbtn" data-s="calm">😌 CALM</button>
+          <button class="smbtn" data-s="curious">🤔 CURIOUS</button>
+          <button class="smbtn" data-s="active">⚡ ACTIVE</button>
+          <button class="smbtn" data-s="alert">🚨 ALERT</button>
+          <button class="smbtn" data-s="chaotic">🌀 CHAOTIC</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑤ Progress -->
+  <section class="slide slide-solar" data-i="4">
+    <h2 class="s-title">開發進度與原型</h2>
+    <p class="s-sub">已在 Hugging Face 部署兩款原型，驗證核心功能</p>
+    <div class="prog-grid">
+      <div class="pg-card">
+        <h4>1. my-reader-gpt</h4>
+        <span class="badge b-blue">聲音核心測試版</span>
+        <p style="font-size:.85rem;margin-bottom:10px">專注於長篇文本高品質語音生成，解決韻律一致性問題。</p>
+        <div style="font-size:.8rem;font-weight:600;color:#2a3a42;margin-bottom:4px">語音自然度 (MOS) 評分</div>
+        <div class="chart-box"><canvas id="mosChart"></canvas></div>
+      </div>
+      <div class="pg-card">
+        <h4>2. holo-reader-final</h4>
+        <span class="badge b-green">多感官整合測試版</span>
+        <p style="font-size:.85rem;margin-bottom:10px">整合多模態訊號映射，建立情緒 → 觸覺/嗅覺轉譯演算法。</p>
+        <div style="font-size:.8rem;font-weight:600;color:#2a3a42;margin-bottom:6px">Week 1 測試覆蓋率</div>
+        <div class="stat-grid">
+          <div class="stat-box"><div class="stat-n">14</div><div>文字分段</div></div>
+          <div class="stat-box"><div class="stat-n">23</div><div>觸覺模擬</div></div>
+          <div class="stat-box"><div class="stat-n">12</div><div>TTS 整合</div></div>
+          <div class="stat-box"><div class="stat-n">10</div><div>端對端</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑥ Future -->
+  <section class="slide slide-solar" data-i="5">
+    <h2 class="s-title">未來展望</h2>
+    <p class="s-sub">打造真正懂您的 AI 閱讀夥伴</p>
+    <div class="fut-grid">
+      <div class="fut-card"><div class="ico">🧠</div><h5>腦波直接讀取</h5><p>整合 EEG，直接從腦波判斷專注與放鬆狀態，毫秒級互動反應。</p></div>
+      <div class="fut-card"><div class="ico">🎯</div><h5>情境感知推薦</h5><p>結合當下心境推薦內容，心情不好時為您送上溫暖的故事。</p></div>
+      <div class="fut-card"><div class="ico">✍️</div><h5>創作者生態系</h5><p>讓作家為作品嵌入「感官特效」，催生全新互動式內容創作。</p></div>
+      <div class="fut-card"><div class="ico">🧊</div><h5>可編程物質</h5><p>將故事「召喚」到現實，親手觸摸書中描寫的質感。</p></div>
+      <div class="fut-card"><div class="ico">✨</div><h5>互動動態投影</h5><p>將動畫投影到日常物品，模糊現實與故事的界線。</p></div>
+      <div class="fut-card"><div class="ico">⚛️</div><h5>Semantica 量子運算</h5><p>以 Semantica 語言原生執行量子演算法，跨模態即時計算。</p></div>
+    </div>
+  </section>
+
+</div><!-- #stage -->
+
+<!-- Navigation -->
+<div id="nav">
+  <button class="nbtn" id="btn-p">‹</button>
+  <div id="dots"></div>
+  <button class="nbtn" id="btn-n">›</button>
+  <span id="ctr"></span>
+</div>
+
+<script>
+/* ── Slides ───────────────────────────────────────────────────── */
+const slides = Array.from(document.querySelectorAll('.slide'));
+const N = slides.length;
+let cur = 0;
+
+// Position all slides side-by-side
+slides.forEach((s, i) => {
+  s.style.transform = `translateX(${i * 100}%)`;
+  s.style.opacity = i === 0 ? '1' : '0.4';
+});
+
+// Build dots
+const dotsEl = document.getElementById('dots');
+const dotEls = slides.map((_, i) => {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i === 0 ? ' on' : '');
+  d.style.cssText = 'display:inline-block;margin:0 4px';
+  d.addEventListener('click', () => go(i));
+  dotsEl.appendChild(d);
+  return d;
+});
+
+const pbar = document.getElementById('pbar');
+const ctr  = document.getElementById('ctr');
+
+function go(idx) {
+  if (idx < 0 || idx >= N) return;
+  cur = idx;
+  slides.forEach((s, i) => {
+    s.style.transform = `translateX(${(i - cur) * 100}%)`;
+    s.style.opacity = i === cur ? '1' : '0.4';
+  });
+  dotEls.forEach((d, i) => d.className = 'dot' + (i === cur ? ' on' : ''));
+  pbar.style.width = `${(cur / (N - 1)) * 100}%`;
+  ctr.textContent = `${cur + 1} / ${N}`;
+  if (cur === 3) startDemo(); else stopDemo();
+  if (cur === 4) initMos();
+}
+
+go(0);
+
+document.getElementById('btn-p').addEventListener('click', () => go(cur - 1));
+document.getElementById('btn-n').addEventListener('click', () => go(cur + 1));
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown')  go(cur + 1);
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')    go(cur - 1);
+});
+
+/* ── HSP Engine tabs ──────────────────────────────────────────── */
+document.querySelectorAll('.tbn').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.tbn').forEach(x => x.classList.remove('on'));
+    document.querySelectorAll('.dp').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    document.getElementById('dp-' + b.dataset.tab).classList.add('on');
+  });
+});
+
+/* ── Signal Dashboard ─────────────────────────────────────────── */
+const SC = { calm:'#00c8d4', curious:'#00aaff', active:'#00e064', alert:'#ff5020', chaotic:'#cc00ff', unknown:'#445566' };
+const TANG = {
+  calm   : { led:[0,200,212],   vib:'low',    servo:45  },
+  curious: { led:[0,170,255],   vib:'medium', servo:90  },
+  active : { led:[0,224,100],   vib:'high',   servo:135 },
+  alert  : { led:[255,80,32],   vib:'pulse',  servo:170 },
+  chaotic: { led:[204,0,255],   vib:'burst',  servo:180 },
+  unknown: { led:[20,20,20],    vib:'–',      servo:0   },
+};
+const FEATS = {
+  calm   : { rms:0.04, zcr:0.05, cen:800  },
+  curious: { rms:0.07, zcr:0.15, cen:1200 },
+  active : { rms:0.20, zcr:0.11, cen:1800 },
+  alert  : { rms:0.18, zcr:0.10, cen:3200 },
+  chaotic: { rms:0.30, zcr:0.25, cen:4000 },
+};
+
+const MAX = 60;
+const series = { rms:[], zcr:[], cen:[] };
+let demoStates = ['calm','curious','active','alert','chaotic'];
+let demoIdx = 0;
+let demoTick = null;
+let chartTick = null;
+
+function applyState(st, conf) {
+  const c = SC[st] || SC.unknown;
+  const t = TANG[st] || TANG.unknown;
+  const pct = Math.round((conf ?? 0.85) * 100);
+  const led = t.led;
+
+  document.getElementById('orb').style.background = `radial-gradient(circle at 35% 35%,#ffffff22,${c})`;
+  document.getElementById('orb').style.boxShadow  = `0 0 36px 8px ${c}`;
+  const lbl = document.getElementById('state-lbl');
+  lbl.textContent = st.toUpperCase(); lbl.style.color = c;
+  document.getElementById('conf-pct').textContent = pct + '%';
+  const fill = document.getElementById('conf-fill');
+  fill.style.width = pct + '%'; fill.style.background = c;
+  document.getElementById('led-sw').style.background = `rgb(${led})`;
+  document.getElementById('led-sw').style.boxShadow  = `0 0 12px 3px rgba(${led},.6)`;
+  document.getElementById('led-v').textContent  = `rgb(${led})`;
+  document.getElementById('vib-v').textContent  = t.vib;
+  document.getElementById('srv-v').textContent  = t.servo + '°';
+  document.getElementById('src-v').textContent  = 'demo';
+}
+
+function pushSample(st) {
+  const f = FEATS[st] || FEATS.calm;
+  const j = () => (Math.random()-.5)*.025;
+  series.rms.push(Math.max(0, f.rms + j()));
+  series.zcr.push(Math.max(0, f.zcr + j()));
+  series.cen.push(Math.min(1, f.cen/5000 + j()));
+  if (series.rms.length > MAX) { series.rms.shift(); series.zcr.shift(); series.cen.shift(); }
+}
+
+function startDemo() {
+  if (demoTick) return;
+  applyState(demoStates[demoIdx], .85);
+  demoTick = setInterval(() => pushSample(demoStates[demoIdx]), 150);
+  chartTick = setInterval(drawChart, 200);
+}
+function stopDemo() {
+  clearInterval(demoTick); demoTick = null;
+  clearInterval(chartTick); chartTick = null;
+}
+
+// Inject buttons
+document.querySelectorAll('.smbtn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const st = btn.dataset.s;
+    demoIdx = demoStates.indexOf(st);
+    applyState(st, .75 + Math.random()*.25);
+  });
+});
+
+// Canvas chart
+const canvas = document.getElementById('feat-canvas');
+const ctx2 = canvas ? canvas.getContext('2d') : null;
+function resizeC() {
+  if (!canvas) return;
+  canvas.width  = (canvas.parentElement?.clientWidth || 400) - 32;
+  canvas.height = 140;
+}
+if (canvas) { resizeC(); window.addEventListener('resize', resizeC); }
+
+function drawChart() {
+  if (!ctx2) return;
+  const W = canvas.width, H = canvas.height;
+  ctx2.clearRect(0, 0, W, H);
+  ctx2.strokeStyle = '#1e2636'; ctx2.lineWidth = 1;
+  [.25,.5,.75,1].forEach(y => {
+    ctx2.beginPath(); ctx2.moveTo(0,H*(1-y)); ctx2.lineTo(W,H*(1-y)); ctx2.stroke();
+  });
+  function line(data, col) {
+    if (!data.length) return;
+    const step = W / (MAX - 1);
+    ctx2.beginPath(); ctx2.strokeStyle = col; ctx2.lineWidth = 1.5;
+    data.forEach((v,i) => { const x=i*step, y=H*(1-Math.min(v,1)); i?ctx2.lineTo(x,y):ctx2.moveTo(x,y); });
+    ctx2.stroke();
+  }
+  line(series.rms, '#00e064');
+  line(series.zcr, '#00aaff');
+  line(series.cen, '#ff5020');
+  [['RMS','#00e064'],['ZCR','#00aaff'],['Centroid','#ff5020']].forEach(([l,c],i) => {
+    ctx2.fillStyle = c; ctx2.fillRect(8+i*82, H-15, 7, 7);
+    ctx2.fillStyle = '#8899aa'; ctx2.font = '9px sans-serif'; ctx2.fillText(l, 18+i*82, H-8);
+  });
+}
+
+/* ── MOS Chart ────────────────────────────────────────────────── */
+let mosInst = null;
+function initMos() {
+  if (mosInst) return;
+  const el = document.getElementById('mosChart');
+  if (!el) return;
+  mosInst = new Chart(el, {
+    type: 'bar',
+    data: {
+      labels: ['my-reader-gpt 語音自然度'],
+      datasets: [{ label: 'MOS', data: [4.3],
+        backgroundColor: ['rgba(38,139,210,.55)'],
+        borderColor:     ['rgba(38,139,210,1)'],
+        borderWidth: 1, barPercentage: .45 }]
+    },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      scales: { x: { beginAtZero:true, max:5, title:{ display:true, text:'分數（最高 5.0）' } } },
+      plugins: {
+        legend: { display:false },
+        tooltip: { callbacks: { label: c => `MOS: ${c.parsed.x.toFixed(1)} / 5.0` } }
+      }
+    }
+  });
+}
+</script>
+</body>
+</html>
